@@ -1,18 +1,18 @@
 pragma solidity >=0.8.4;
 
-import "./ENS.sol";
-import "./ENSRegistry.sol";
+import "./DNS.sol";
+import "./DNSRegistry.sol";
 
 /**
- * The ENS registry contract.
+ * The DNS registry contract.
  */
-contract ENSRegistryWithFallback is ENSRegistry {
-    ENS public old;
+contract DNSRegistryWithFallback is DNSRegistry {
+    DNS public old;
 
     /**
-     * @dev Constructs a new ENS registrar.
+     * @dev Constructs a new DNS registrar.
      */
-    constructor(ENS _old) public ENSRegistry() {
+    constructor(DNS _old) public DNSRegistry() {
         old = _old;
     }
 

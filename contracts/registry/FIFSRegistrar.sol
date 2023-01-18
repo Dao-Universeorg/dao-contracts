@@ -1,16 +1,16 @@
 pragma solidity >=0.8.4;
 
-import "./ENS.sol";
+import "./DNS.sol";
 
 /**
  * A registrar that allocates subdomains to the first person to claim them.
  */
 contract FIFSRegistrar {
-    ENS ens;
+    DNS dns;
     bytes32 rootNode;
 
     modifier only_owner(bytes32 label) {
-        address currentOwner = ens.owner(
+        address currentOwner = dns.owner(
             keccak256(abi.encodePacked(rootNode, label))
         );
         require(currentOwner == address(0x0) || currentOwner == msg.sender);
@@ -19,11 +19,11 @@ contract FIFSRegistrar {
 
     /**
      * Constructor.
-     * @param ensAddr The address of the ENS registry.
+     * @param dnsAddr The address of the DNS registry.
      * @param node The node that this registrar administers.
      */
-    constructor(ENS ensAddr, bytes32 node) public {
-        ens = ensAddr;
+    constructor(DNS dnsAddr, bytes32 node) public {
+        dns = dnsAddr;
         rootNode = node;
     }
 
@@ -33,6 +33,6 @@ contract FIFSRegistrar {
      * @param owner The address of the new owner.
      */
     function register(bytes32 label, address owner) public only_owner(label) {
-        ens.setSubnodeOwner(rootNode, label, owner);
+        dns.setSubnodeOwner(rootNode, label, owner);
     }
 }

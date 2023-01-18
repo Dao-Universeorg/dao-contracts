@@ -3,7 +3,7 @@ const namehash = require('eth-ens-namehash')
 const sha3 = require('web3-utils').sha3
 const toBN = require('web3-utils').toBN
 
-const ENS = artifacts.require('./registry/ENSRegistry')
+const DNS = artifacts.require('./registry/DNSRegistry')
 const BaseRegistrar = artifacts.require('./BaseRegistrarImplementation')
 const DummyOracle = artifacts.require('./DummyOracle')
 const ExponentialPremiumPriceOracle = artifacts.require(
@@ -25,9 +25,9 @@ contract('ExponentialPricePremiumOracle', function(accounts) {
   let priceOracle
 
   before(async () => {
-    ens = await ENS.new()
-    registrar = await BaseRegistrar.new(ens.address, namehash.hash('dao'))
-    await ens.setSubnodeOwner('0x0', sha3('dao'), registrar.address)
+    dns = await DNS.new()
+    registrar = await BaseRegistrar.new(dns.address, namehash.hash('dao'))
+    await dns.setSubnodeOwner('0x0', sha3('dao'), registrar.address)
     await registrar.addController(accounts[0])
 
     // Dummy oracle with 1 ETH == 2 USD

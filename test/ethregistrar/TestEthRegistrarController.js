@@ -20,7 +20,7 @@ const EMPTY_BYTES =
 const MAX_EXPIRY = 2n ** 64n - 1n
 const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 contract('ETHRegistrarController', function () {
-  let ens
+  let dns
   let resolver
   let resolver2 // resolver signed by accounts[1]
   let baseRegistrar
@@ -81,24 +81,24 @@ contract('ETHRegistrarController', function () {
     registrantAccount = await signers[1].getAddress()
     accounts = [ownerAccount, registrantAccount, signers[2].getAddress()]
 
-    ens = await deploy('ENSRegistry')
+    dns = await deploy('DNSRegistry')
 
     baseRegistrar = await deploy(
       'BaseRegistrarImplementation',
-      ens.address,
+      dns.address,
       namehash('dao'),
     )
 
     nameWrapper = await deploy(
       'NameWrapper',
-      ens.address,
+      dns.address,
       baseRegistrar.address,
       ownerAccount,
     )
 
-    reverseRegistrar = await deploy('ReverseRegistrar', ens.address)
+    reverseRegistrar = await deploy('ReverseRegistrar', dns.address)
 
-    await ens.setSubnodeOwner(EMPTY_BYTES, sha3('dao'), baseRegistrar.address)
+    await dns.setSubnodeOwner(EMPTY_BYTES, sha3('dao'), baseRegistrar.address)
 
     const dummyOracle = await deploy('DummyOracle', '100000000')
     priceOracle = await deploy(
@@ -122,7 +122,7 @@ contract('ETHRegistrarController', function () {
 
     resolver = await deploy(
       'PublicResolver',
-      ens.address,
+      dns.address,
       nameWrapper.address,
       controller.address,
       reverseRegistrar.address,
@@ -142,10 +142,10 @@ contract('ETHRegistrarController', function () {
 
     resolver2 = await resolver.connect(signers[1])
 
-    await ens.setSubnodeOwner(EMPTY_BYTES, sha3('reverse'), accounts[0], {
+    await dns.setSubnodeOwner(EMPTY_BYTES, sha3('reverse'), accounts[0], {
       from: accounts[0],
     })
-    await ens.setSubnodeOwner(
+    await dns.setSubnodeOwner(
       namehash('reverse'),
       sha3('addr'),
       reverseRegistrar.address,
@@ -277,8 +277,8 @@ contract('ETHRegistrarController', function () {
     ).to.equal(REGISTRATION_TIME)
 
     var nodehash = namehash('newconfigname.dao')
-    expect(await ens.resolver(nodehash)).to.equal(resolver.address)
-    expect(await ens.owner(nodehash)).to.equal(nameWrapper.address)
+    expect(await dns.resolver(nodehash)).to.equal(resolver.address)
+    expect(await dns.owner(nodehash)).to.equal(nameWrapper.address)
     expect(await baseRegistrar.ownerOf(sha3('newconfigname'))).to.equal(
       nameWrapper.address,
     )
@@ -521,7 +521,7 @@ contract('ETHRegistrarController', function () {
       )
 
     const nodehash = namehash('newconfigname2.dao')
-    expect(await ens.resolver(nodehash)).to.equal(resolver.address)
+    expect(await dns.resolver(nodehash)).to.equal(resolver.address)
     expect(await resolver['addr(bytes32)'](nodehash)).to.equal(NULL_ADDRESS)
     expect(
       (await web3.eth.getBalance(controller.address)) - balanceBefore,
@@ -829,7 +829,7 @@ contract('ETHRegistrarController', function () {
       registrantAccount,
     )
 
-    expect(await ens.owner(namehash(name))).to.equal(nameWrapper.address)
+    expect(await dns.owner(namehash(name))).to.equal(nameWrapper.address)
     expect(await baseRegistrar.ownerOf(sha3(label))).to.equal(
       nameWrapper.address,
     )
@@ -959,7 +959,7 @@ contract('ETHRegistrarController', function () {
     console.log(gasA.toString(), gasB.toString())
 
     expect(await nameWrapper.ownerOf(node)).to.equal(registrantAccount)
-    expect(await ens.owner(namehash(name))).to.equal(nameWrapper.address)
+    expect(await dns.owner(namehash(name))).to.equal(nameWrapper.address)
     expect(await baseRegistrar.ownerOf(sha3(label))).to.equal(
       nameWrapper.address,
     )

@@ -38,8 +38,8 @@ function shouldRespectConstraints(contracts, getSigners) {
   let BaseRegistrar
   let NameWrapper
   let NameWrapper2
-  let EnsRegistry
-  let EnsRegistry2
+  let DnsRegistry
+  let DnsRegistry2
 
   let parentLabel = 'test1'
   let parentLabelHash = labelhash(parentLabel)
@@ -52,7 +52,7 @@ function shouldRespectConstraints(contracts, getSigners) {
     const signers = getSigners()
     account = await signers[0].getAddress()
     account2 = await signers[1].getAddress()
-    ;({ BaseRegistrar, NameWrapper, NameWrapper2, EnsRegistry, EnsRegistry2 } =
+    ;({ BaseRegistrar, NameWrapper, NameWrapper2, DnsRegistry, DnsRegistry2 } =
       contracts())
     await BaseRegistrar.setApprovalForAll(NameWrapper.address, true)
   })
@@ -370,7 +370,7 @@ function shouldRespectConstraints(contracts, getSigners) {
     it('Parent can unwrap owner with setSubnodeRecord() and then unwrap', async () => {
       //check previous owners
       expect(await NameWrapper.ownerOf(childNode)).to.equal(account2)
-      expect(await EnsRegistry.owner(childNode)).to.equal(NameWrapper.address)
+      expect(await DnsRegistry.owner(childNode)).to.equal(NameWrapper.address)
 
       await NameWrapper.setSubnodeRecord(
         parentNode,
@@ -384,7 +384,7 @@ function shouldRespectConstraints(contracts, getSigners) {
 
       await NameWrapper.unwrap(parentNode, childLabelHash, account)
       expect(await NameWrapper.ownerOf(childNode)).to.equal(EMPTY_ADDRESS)
-      expect(await EnsRegistry.owner(childNode)).to.equal(account)
+      expect(await DnsRegistry.owner(childNode)).to.equal(account)
     })
   }
 
@@ -697,8 +697,8 @@ function shouldRespectConstraints(contracts, getSigners) {
       ).to.be.revertedWith(`Unauthorised("${childNode}", "${account}")`)
     })
 
-    it('Parent cannot call ens.subnodeOwner to forcefully unwrap', async () => {
-      await expect(EnsRegistry.setSubnodeOwner(parentNode, childNode, account))
+    it('Parent cannot call dns.subnodeOwner to forcefully unwrap', async () => {
+      await expect(DnsRegistry.setSubnodeOwner(parentNode, childNode, account))
         .to.be.reverted
     })
   }
@@ -1169,7 +1169,7 @@ function shouldRespectConstraints(contracts, getSigners) {
       const [, fusesBefore] = await NameWrapper2.getData(childNode)
       expect(fusesBefore).to.equal(PARENT_CANNOT_CONTROL)
       await NameWrapper2.unwrap(parentNode, childLabelHash, account2)
-      await EnsRegistry2.setApprovalForAll(NameWrapper2.address, true)
+      await DnsRegistry2.setApprovalForAll(NameWrapper2.address, true)
       await NameWrapper2.wrap(
         encodeName(`${childLabel}.${parentLabel}.dao`),
         account2,

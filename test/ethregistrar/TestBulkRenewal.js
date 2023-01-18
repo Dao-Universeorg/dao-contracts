@@ -1,4 +1,4 @@
-const ENS = artifacts.require('./registry/ENSRegistry')
+const DNS = artifacts.require('./registry/DNSRegistry')
 const PublicResolver = artifacts.require('./resolvers/PublicResolver')
 const BaseRegistrar = artifacts.require('./BaseRegistrarImplementation')
 const ETHRegistrarController = artifacts.require('./ETHRegistrarController')
@@ -16,7 +16,7 @@ const ETH_LABEL = sha3('dao')
 const ETH_NAMEHASH = namehash.hash('dao')
 
 contract('BulkRenewal', function(accounts) {
-  let ens
+  let dns
   let resolver
   let baseRegistrar
   let controller
@@ -30,20 +30,20 @@ contract('BulkRenewal', function(accounts) {
 
   before(async () => {
     // Create a registry
-    ens = await ENS.new()
+    dns = await DNS.new()
     // Create a base registrar
-    baseRegistrar = await BaseRegistrar.new(ens.address, namehash.hash('dao'), {
+    baseRegistrar = await BaseRegistrar.new(dns.address, namehash.hash('dao'), {
       from: ownerAccount,
     })
 
     nameWrapper = await NameWrapper.new(
-      ens.address,
+      dns.address,
       baseRegistrar.address,
       ownerAccount
     )
     // Create a public resolver
     resolver = await PublicResolver.new(
-      ens.address,
+      dns.address,
       nameWrapper.address,
       EMPTY_ADDRESS,
       EMPTY_ADDRESS
@@ -75,11 +75,11 @@ contract('BulkRenewal', function(accounts) {
     await baseRegistrar.addController(nameWrapper.address, { from: ownerAccount })
     await nameWrapper.setController(controller.address, true, { from: ownerAccount })
     // Create the bulk registration contract
-    bulkRenewal = await BulkRenewal.new(ens.address)
+    bulkRenewal = await BulkRenewal.new(dns.address)
 
     // Configure a resolver for .dao and register the controller interface
     // then transfer the .dao node to the base registrar.
-    await ens.setSubnodeRecord(
+    await dns.setSubnodeRecord(
       '0x0',
       ETH_LABEL,
       ownerAccount,
@@ -87,7 +87,7 @@ contract('BulkRenewal', function(accounts) {
       0
     )
     await resolver.setInterface(ETH_NAMEHASH, '0xdf7ed181', controller.address)
-    await ens.setOwner(ETH_NAMEHASH, baseRegistrar.address)
+    await dns.setOwner(ETH_NAMEHASH, baseRegistrar.address)
 
     // Register some names
     for (const name of ['test1', 'test2', 'test3']) {

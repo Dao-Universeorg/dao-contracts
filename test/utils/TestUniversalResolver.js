@@ -1,4 +1,4 @@
-const ENS = artifacts.require("./registry/ENSRegistry.sol");
+const DNS = artifacts.require("./registry/DNSRegistry.sol");
 const PublicResolver = artifacts.require("PublicResolver.sol");
 const NameWrapper = artifacts.require("DummyNameWrapper.sol");
 const UniversalResolver = artifacts.require("UniversalResolver.sol");
@@ -15,7 +15,7 @@ const { dns } = require("../test-utils");
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 contract("UniversalResolver", function(accounts) {
-  let ens,
+  let dns,
     publicResolver,
     universalResolver,
     dummyOffchainResolver,
@@ -25,44 +25,44 @@ contract("UniversalResolver", function(accounts) {
 
   beforeEach(async () => {
     node = namehash.hash("dao");
-    ens = await ENS.new();
+    dns = await DNS.new();
     nameWrapper = await NameWrapper.new();
     publicResolver = await PublicResolver.new(
-      ens.address,
+      dns.address,
       nameWrapper.address,
       ZERO_ADDRESS,
       ZERO_ADDRESS
     );
-    universalResolver = await UniversalResolver.new(ens.address);
+    universalResolver = await UniversalResolver.new(dns.address);
     dummyOffchainResolver = await DummyOffchainResolver.new();
-    reverseRegistrar = await ReverseRegistrar.new(ens.address);
+    reverseRegistrar = await ReverseRegistrar.new(dns.address);
     reverseNode = accounts[0].toLowerCase().substring(2) + ".addr.reverse";
 
-    await ens.setSubnodeOwner("0x0", sha3("dao"), accounts[0], {
+    await dns.setSubnodeOwner("0x0", sha3("dao"), accounts[0], {
       from: accounts[0],
     });
-    await ens.setSubnodeOwner(namehash.hash("dao"), sha3("test"), accounts[0], {
+    await dns.setSubnodeOwner(namehash.hash("dao"), sha3("test"), accounts[0], {
       from: accounts[0],
     });
-    await ens.setSubnodeOwner("0x0", sha3("reverse"), accounts[0], {
+    await dns.setSubnodeOwner("0x0", sha3("reverse"), accounts[0], {
       from: accounts[0],
     });
-    await ens.setSubnodeOwner(
+    await dns.setSubnodeOwner(
       namehash.hash("reverse"),
       sha3("addr"),
       reverseRegistrar.address,
       { from: accounts[0] }
     );
-    await ens.setResolver(namehash.hash("test.dao"), publicResolver.address, {
+    await dns.setResolver(namehash.hash("test.dao"), publicResolver.address, {
       from: accounts[0],
     });
-    await ens.setSubnodeOwner(
+    await dns.setSubnodeOwner(
       namehash.hash("test.dao"),
       sha3("sub"),
       accounts[0],
       { from: accounts[0] }
     );
-    await ens.setResolver(namehash.hash("sub.test.dao"), accounts[1], {
+    await dns.setResolver(namehash.hash("sub.test.dao"), accounts[1], {
       from: accounts[0],
     });
     await publicResolver.methods["setAddr(bytes32,address)"](
@@ -73,13 +73,13 @@ contract("UniversalResolver", function(accounts) {
     await publicResolver.methods[
       "setText(bytes32,string,string)"
     ](namehash.hash("test.dao"), "foo", "bar", { from: accounts[0] });
-    await ens.setSubnodeOwner(
+    await dns.setSubnodeOwner(
       namehash.hash("test.dao"),
       sha3("offchain"),
       accounts[0],
       { from: accounts[0] }
     );
-    await ens.setResolver(
+    await dns.setResolver(
       namehash.hash("offchain.test.dao"),
       dummyOffchainResolver.address,
       { from: accounts[0] }
@@ -88,7 +88,7 @@ contract("UniversalResolver", function(accounts) {
     await reverseRegistrar.claim(accounts[0], {
       from: accounts[0],
     });
-    await ens.setResolver(namehash.hash(reverseNode), publicResolver.address, {
+    await dns.setResolver(namehash.hash(reverseNode), publicResolver.address, {
       from: accounts[0],
     });
     await publicResolver.setName(namehash.hash(reverseNode), "test.dao");
@@ -138,13 +138,13 @@ contract("UniversalResolver", function(accounts) {
     describe("resolve()", () => {
       it("should resolve a record if `supportsInterface` throws", async () => {
         const legacyResolver = await LegacyResolver.new();
-        await ens.setSubnodeOwner(
+        await dns.setSubnodeOwner(
           namehash.hash("dao"),
           sha3("test2"),
           accounts[0],
           { from: accounts[0] }
         );
-        await ens.setResolver(
+        await dns.setResolver(
           namehash.hash("test2.dao"),
           legacyResolver.address,
           { from: accounts[0] }

@@ -1,6 +1,6 @@
 const fs = require('fs')
 const envfile = require('envfile')
-const ensAppSourcePath = '../ens-app/cypress.env.json'
+const dnsAppSourcePath = '../dns-app/cypress.env.json'
 const { network, run } = require("hardhat")
 const parsedFile = envfile.parse(fs.readFileSync('./.env'))
 
@@ -20,15 +20,15 @@ async function main() {
     METADATA_ADDRESS:metadataAddress,
     WRAPPER_ADDRESS:wrapperAddress,
     RESOLVER_ADDRESS:resolverAddress,
-    METADATA_HOST:metadataHost = 'ens-metadata-service.appspot.com'
+    METADATA_HOST:metadataHost = 'dns-metadata-service.appspot.com'
   } = parsedFile)
   if(network.name === 'localhost'){
-    const addresses = JSON.parse(fs.readFileSync(ensAppSourcePath, 'utf8'))
-    registryAddress = addresses.ensAddress
+    const addresses = JSON.parse(fs.readFileSync(dnsAppSourcePath, 'utf8'))
+    registryAddress = addresses.dnsAddress
     registrarAddress = addresses.baseRegistrarAddress
     metadataUrl = 'http://localhost:8080/name/0x{id}'
-    if(!(addresses.ensAddress && addresses.baseRegistrarAddress)){
-      throw('please run yarn preTest on ../ens-app')
+    if(!(addresses.dnsAddress && addresses.baseRegistrarAddress)){
+      throw('please run yarn preTest on ../dns-app')
     }  
   }else{
     // Regisry and registrar addresses are same across all networks

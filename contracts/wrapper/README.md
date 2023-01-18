@@ -1,6 +1,6 @@
-# ENS Name Wrapper
+# DNS Name Wrapper
 
-The ENS Name Wrapper is a smart contract that wraps existing ENS names, providing several new features:
+The DNS Name Wrapper is a smart contract that wraps existing DNS names, providing several new features:
 
 - Wrapped names are ERC1155 tokens
 - Better permission control over wrapped names
@@ -9,9 +9,9 @@ The ENS Name Wrapper is a smart contract that wraps existing ENS names, providin
 
 In addition to implementing ERC1155, wrapped names have an ERC721-compatible `ownerOf` function to return the owner of a wrapped name.
 
-Making ENS names ERC1155 compatible allows them to be displayed, transferred and traded in any wallet that supports the standard.
+Making DNS names ERC1155 compatible allows them to be displayed, transferred and traded in any wallet that supports the standard.
 
-`NameWrapper` implements the optional ERC1155 metadata extension; presently this is via an HTTPS URL to a service ENS operates, but this can be changed in future as better options become available.
+`NameWrapper` implements the optional ERC1155 metadata extension; presently this is via an HTTPS URL to a service DNS operates, but this can be changed in future as better options become available.
 
 With the exception of the functionality to upgrade the metadata generation for tokens. 
 
@@ -43,7 +43,7 @@ abiCoder.encode(
 
 ## Unwrapping a name
 
-Wrapped names can be unwrapped by calling either `unwrapETH2LD(labelHash, newRegistrant, newController)` or `unwrap(parentNode, label, newController)` as appropriate. `label` and `parentNode` have meanings as described under "Wrapping a name", while `newRegistrant` is the address that should own the .dao registrar token, and `newController` is the address that should be set as the owner of the ENS registry record.
+Wrapped names can be unwrapped by calling either `unwrapETH2LD(labelHash, newRegistrant, newController)` or `unwrap(parentNode, label, newController)` as appropriate. `label` and `parentNode` have meanings as described under "Wrapping a name", while `newRegistrant` is the address that should own the .dao registrar token, and `newController` is the address that should be set as the owner of the DNS registry record.
 
 ## Working with wrapped names
 
@@ -63,7 +63,7 @@ When any fuses on a name are burned, the "unwrap" fuse must also be burned, to p
 
 In addition to burning these two fuses a name must also have an expiry of less than the current date. If the name has expired, the fuses will automatically be set to 0. This is enforced by the contract, but does *not* revert, however no fuses will be burned. Expiry will be explained in more detail below.
 
-The ENS root and the .dao 2LD are treated as having the "replace subdomain" and "unwrap" fuses burned. There is one edge-case here insofar as a .dao name's registration can expire; at that point the name can be purchased by a new registrant and effectively becomes unwrapped despite any fuse restrictions. When that name is re-wrapped, fuse fields can be set to a more permissive value than the name previously had. Any application relying on fuse values for .dao subdomains should check the expiration date of the .dao name and warn users if this is likely to expire soon.
+The DNS root and the .dao 2LD are treated as having the "replace subdomain" and "unwrap" fuses burned. There is one edge-case here insofar as a .dao name's registration can expire; at that point the name can be purchased by a new registrant and effectively becomes unwrapped despite any fuse restrictions. When that name is re-wrapped, fuse fields can be set to a more permissive value than the name previously had. Any application relying on fuse values for .dao subdomains should check the expiration date of the .dao name and warn users if this is likely to expire soon.
 
 The fuses field is 32 bits, and only 7 fuses are defined by the `NameWrapper` contract itself. Applications may use additional fuse bits to encode their own restrictions on applications. Any application wishing to do so should submit a PR to this README in order to record the use of the value and ensure there is no unintentional overlap.
 
@@ -175,12 +175,12 @@ Account balance: 1934772596667918724 true
   registryAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
   registrarAddress: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85'
 }
-Setting metadata service to https://ens-metadata-service.appspot.com/name/0x{id}
+Setting metadata service to https://dns-metadata-service.appspot.com/name/0x{id}
 Metadata address: 0x08f2D8D8240fC70FD777358b0c63e539714DD473
 Wrapper address: 0x88ce50eFeA21996B20838d5E71994191562758f9
 Resolver address: 0x784b7B9BA0Fc04b90187c06C0C7efC51AeA06aFB
 wait for 5 sec until bytecodes are uploaded into etherscan
-verify  0x08f2D8D8240fC70FD777358b0c63e539714DD473 with arguments https://ens-metadata-service.appspot.com/name/0x{id}
+verify  0x08f2D8D8240fC70FD777358b0c63e539714DD473 with arguments https://dns-metadata-service.appspot.com/name/0x{id}
 verify  0x88ce50eFeA21996B20838d5E71994191562758f9 with arguments 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e,0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85,0x08f2D8D8240fC70FD777358b0c63e539714DD473
 verify  0x784b7B9BA0Fc04b90187c06C0C7efC51AeA06aFB with arguments 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e,0x88ce50eFeA21996B20838d5E71994191562758f9
 ```
@@ -194,7 +194,7 @@ After running the script it sets addresses to `.env`. If you want to redeploy so
 3. Run `yarn seed:rinkeby`
 
 ```
-~/.../ens/name-wrapper (seed)$yarn seed:rinkeby
+~/.../dns/name-wrapper (seed)$yarn seed:rinkeby
 yarn run v1.22.10
 $ npx hardhat run --network rinkeby scripts/seed.js
 Account balance: 1925134991223891632

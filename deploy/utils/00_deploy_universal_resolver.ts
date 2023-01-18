@@ -7,7 +7,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments
   const { deployer } = await getNamedAccounts()
 
-  const registry = await ethers.getContract('ENSRegistry')
+  const registry = await ethers.getContract('DNSRegistry')
 
   await deploy('UniversalResolver', {
     from: deployer,
@@ -20,6 +20,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 func.id = 'universal-resolver'
 func.tags = [ 'UniversalResolver']
-func.dependencies = ['ENSRegistry']
+func.dependencies = ['DNSRegistry']
 
 export default func

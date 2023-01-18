@@ -1,4 +1,4 @@
-const ENS = artifacts.require('./registry/ENSRegistry.sol')
+const DNS = artifacts.require('./registry/DNSRegistry.sol')
 const PublicResolver = artifacts.require('PublicResolver.sol')
 const NameWrapper = artifacts.require('DummyNameWrapper.sol')
 
@@ -10,20 +10,20 @@ const { exceptions } = require('../test-utils')
 
 contract('PublicResolver', function(accounts) {
   let node
-  let ens, resolver, nameWrapper
+  let dns, resolver, nameWrapper
   const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 
   beforeEach(async () => {
     node = namehash.hash('dao')
-    ens = await ENS.new()
+    dns = await DNS.new()
     nameWrapper = await NameWrapper.new()
     resolver = await PublicResolver.new(
-      ens.address,
+      dns.address,
       nameWrapper.address,
       accounts[9], // trusted contract
       EMPTY_ADDRESS
     )
-    await ens.setSubnodeOwner('0x0', sha3('dao'), accounts[0], {
+    await dns.setSubnodeOwner('0x0', sha3('dao'), accounts[0], {
       from: accounts[0],
     })
   })
@@ -1035,8 +1035,8 @@ contract('PublicResolver', function(accounts) {
     })
 
     it('returns 0 on fallback when target contract does not support implementsInterface', async () => {
-      // Set addr to the ENS registry, which doesn't implement supportsInterface.
-      await resolver.methods['setAddr(bytes32,address)'](node, ens.address, {
+      // Set addr to the DNS registry, which doesn't implement supportsInterface.
+      await resolver.methods['setAddr(bytes32,address)'](node, dns.address, {
         from: accounts[0],
       })
       // Check the ID for `supportsInterface(bytes4)`
@@ -1081,7 +1081,7 @@ contract('PublicResolver', function(accounts) {
         from: accounts[0],
       })
       assert.equal(
-        await resolver.isApprovedForAll(await ens.owner(node), accounts[1]),
+        await resolver.isApprovedForAll(await dns.owner(node), accounts[1]),
         true
       )
       await resolver.methods['setAddr(bytes32,address)'](node, accounts[1], {
@@ -1118,7 +1118,7 @@ contract('PublicResolver', function(accounts) {
       await resolver.setApprovalForAll(accounts[2], true, {
         from: accounts[1],
       })
-      await ens.setOwner(node, accounts[1], { from: accounts[0] })
+      await dns.setOwner(node, accounts[1], { from: accounts[0] })
 
       await resolver.methods['setAddr(bytes32,address)'](node, accounts[0], {
         from: accounts[2],
@@ -1153,14 +1153,14 @@ contract('PublicResolver', function(accounts) {
     })
 
     it('permits name wrapper owner to make changes if owner is set to name wrapper address', async () => {
-      var owner = await ens.owner(node)
+      var owner = await dns.owner(node)
       var operator = accounts[2]
       await exceptions.expectFailure(
         resolver.methods['setAddr(bytes32,address)'](node, owner, {
           from: operator,
         })
       )
-      await ens.setOwner(node, nameWrapper.address, { from: owner })
+      await dns.setOwner(node, nameWrapper.address, { from: owner })
       await expect(
         resolver.methods['setAddr(bytes32,address)'](node, owner, {
           from: operator,

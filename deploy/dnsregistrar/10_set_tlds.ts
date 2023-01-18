@@ -4,8 +4,8 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 // import { ZERO_HASH } from '../constants'
 
 const tld_map = {
-  mainnet: ['fyi'],
-  testnet: ['fyi']
+  mainnet: ['xyz'],
+  testnet: ['xyz']
 }
 
 const ZERO_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -79,7 +79,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let transactions: any[] = []
   if (network.tags.use_root) {
     const root = await ethers.getContract('Root', signer)
-    const registry = await ethers.getContract('ENSRegistry', signer)
+    const registry = await ethers.getContract('DNSRegistry', signer)
     transactions = await setTLDsOnRoot(
       owner,
       root,
@@ -88,7 +88,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       tld_map[network.name as keyof typeof tld_map],
     )
   } else {
-    const registry = await ethers.getContract('ENSRegistry', signer)
+    const registry = await ethers.getContract('DNSRegistry', signer)
     transactions = await setTLDsOnRegistry(
       owner,
       registry,
@@ -109,6 +109,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 func.id = 'set-dns-registrar'
 func.tags = ['SetDNSRegistrar']
-func.dependencies = ['ENSRegistry', 'Root', 'DNSSecOracle']
+func.dependencies = ['DNSRegistry', 'Root', 'DNSSecOracle']
 
 export default func

@@ -26,7 +26,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { getNamedAccounts, deployments } = hre
   const { owner } = await getNamedAccounts()
 
-  const registry = await ethers.getContract('ENSRegistry', owner)
+  const registry = await ethers.getContract('DNSRegistry', owner)
   const root = await ethers.getContract('Root', owner);
   const registrar = await ethers.getContract('BaseRegistrarImplementation', owner)
   const nameWrapper = await ethers.getContract('NameWrapper', owner)
@@ -55,12 +55,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`Setting address for resolver.dao to PublicResolver (tx: ${tx3.hash})...`)
   await tx3.wait()
 
-  const providerWithEns = new ethers.providers.StaticJsonRpcProvider(
+  const providerWithDns = new ethers.providers.StaticJsonRpcProvider(
     network.name === 'mainnet' ? 'https://goerli-rollup.daoitrum.io/rpc' : 'https://goerli.infura.io/v3/0722a322db3e472881be79bebc2e994c',
-    { chainId: network.name === 'mainnet' ? 421613 : 5, name: 'goerli', ensAddress: registry.address },
+    { chainId: network.name === 'mainnet' ? 421613 : 5, name: 'goerli', dnsAddress: registry.address },
   )
 
-  const resolverAddr = await providerWithEns.getResolver('dao')
+  const resolverAddr = await providerWithDns.getResolver('dao')
   if (resolverAddr === null) {
     console.log('No resolver set for .dao not setting interface')
     return
@@ -95,7 +95,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 func.id = 'final-setup'
 func.tags = ['FinalSetup']
 func.dependencies = [
-  'ENSRegistry',
+  'DNSRegistry',
   'BaseRegistrarImplementation',
   'NameWrapper',
   'ETHRegistrarController',

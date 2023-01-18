@@ -38,7 +38,7 @@ async function main(a) {
     console.log({
       registryAddress,registrarAddress, wrapperAddress, resolverAddress,firstAddress, name
     })
-    const EnsRegistry = await (await ethers.getContractFactory("ENSRegistry")).attach(registryAddress)
+    const DnsRegistry = await (await ethers.getContractFactory("DNSRegistry")).attach(registryAddress)
     const BaseRegistrar = await (await ethers.getContractFactory("BaseRegistrarImplementation")).attach(registrarAddress)
     const NameWrapper = await (await ethers.getContractFactory("NameWrapper")).attach(wrapperAddress)
     const Resolver = await (await ethers.getContractFactory("PublicResolver")).attach(resolverAddress)
@@ -46,13 +46,13 @@ async function main(a) {
     const namehashedname = namehash(domain)
     
     await (await BaseRegistrar.setApprovalForAll(NameWrapper.address, true)).wait()
-    await (await EnsRegistry.setApprovalForAll(NameWrapper.address, true)).wait()
+    await (await DnsRegistry.setApprovalForAll(NameWrapper.address, true)).wait()
     await (await NameWrapper.wrapETH2LD(name, firstAddress, CAN_DO_EVERYTHING)).wait()
     console.log(`Wrapped NFT for ${domain} is available at ${getOpenSeaUrl(NameWrapper.address, namehashedname)}`)
     await (await NameWrapper.setSubnodeOwnerAndWrap(namehash(`${name}.dao`), 'sub1', firstAddress, CAN_DO_EVERYTHING)).wait()
     await (await NameWrapper.setSubnodeOwnerAndWrap(namehash(`${name}.dao`), 'sub2', firstAddress, CAN_DO_EVERYTHING)).wait()
     await (await NameWrapper.setResolver(namehash(`sub2.${name}.dao`), resolverAddress)).wait()
-    await (await Resolver.setText(namehash(`sub2.${name}.dao`), 'domains.ens.nft.image', 'https://i.imgur.com/JcZESMp.png')).wait()
+    await (await Resolver.setText(namehash(`sub2.${name}.dao`), 'domains.dns.nft.image', 'https://i.imgur.com/JcZESMp.png')).wait()
     console.log(`Wrapped NFT for sub2.${name}.dao is available at ${getOpenSeaUrl(NameWrapper.address, namehash(`sub2.${name}.dao`))}`)
     await (await NameWrapper.burnFuses(namehash(`sub2.${name}.dao`),CANNOT_UNWRAP)).wait()
     await (await NameWrapper.burnFuses(namehash(`sub2.${name}.dao`),CANNOT_SET_RESOLVER)).wait()
