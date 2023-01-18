@@ -139,28 +139,28 @@ const config: HardhatUserConfig = {
     },
 
     mainnet: {
-      url: 'https://goerli-rollup.arbitrum.io/rpc',
-      chainId: 421613,
+      url: `https://infura.io/v3/${process.env.INFURA_API_KEY}`,
+      chainId: 1,
       accounts: real_accounts,
-      gasPrice: 10000000000,
     },
-    testnet: {
-      url: 'https://goerli.infura.io/v3/0722a322db3e472881be79bebc2e994c',
+    goerli: {
+      url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
       tags: ['use_root'],
       chainId: 5,
-      accounts: real_accounts, // using this one
+      accounts: real_accounts,
+    },
+    fantom: {
+      url: 'https://rpcapi.fantom.network',
+      tags: ['use_root'],
+      chainId: 250,
+      accounts: real_accounts,
+    },
+    fantomtestnet: {
+      url: 'https://rpc.testnet.fantom.network',
+      tags: ['use_root'],
+      chainId: 4002,
+      accounts: real_accounts,
     }
-    
-    // testnet: {
-    //   url: 'https://goerli.infura.io/v3/0722a322db3e472881be79bebc2e994c',
-    //   tags: ['use_root'],
-    //   chainId: 5,
-    //   accounts: {
-    //     mnemonic: "object forget twelve observe prison what solution horror escape hidden raccoon uncover"
-    //   },
-    //   gasPrice:4000000000,
-    //   gas: 27000000,
-    // }
   },
   mocha: {},
   solidity: {
@@ -209,19 +209,19 @@ const config: HardhatUserConfig = {
     ],
   },
   
-  // etherscan: {
-  //   apiKey: "VRMUC7MPSMM4G79WD69UND33XFR6ZMES3K",
-  //   customChains: [
-  //     {
-  //       network: "goerli",
-  //       chainId: 5,
-  //       urls: {
-  //         apiURL: "https://api-goerli.etherscan.io/api",
-  //         browserURL: "https://goerli.etherscan.io/"
-  //       }
-  //     }
-  //   ]
-  // },
+  etherscan: {
+    apiKey: '{process.env.ETHERSCAN_API_KEY}',
+    customChains: [
+      {
+        network: "goerli",
+        chainId: 5,
+        urls: {
+          apiURL: "https://api-goerli.etherscan.io/api",
+          browserURL: "https://goerli.etherscan.io/"
+        }
+      }
+    ]
+  },
 }
 
 export default config
