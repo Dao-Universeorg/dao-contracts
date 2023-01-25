@@ -160,6 +160,12 @@ const config: HardhatUserConfig = {
       tags: ['use_root'],
       chainId: 4002,
       accounts: real_accounts,
+    },
+    optimism_goerli: {
+      url: 'https://goerli.optimism.io',
+      tags: ['use_root'],
+      chainId: 420,
+      accounts: real_accounts,
     }
   },
   mocha: {},
